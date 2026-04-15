@@ -30,17 +30,23 @@ export default function SignUpPage() {
 
     setLoading(true);
 
-    const supabase = getSupabase();
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    try {
+      const supabase = getSupabase();
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    } else {
-      setSuccess(true);
+      if (signUpError) {
+        setError(signUpError.message);
+        setLoading(false);
+      } else {
+        // Email confirmation is off — user is auto-signed in
+        router.refresh();
+        router.push("/upload");
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
       setLoading(false);
     }
   };

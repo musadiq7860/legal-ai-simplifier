@@ -2,13 +2,20 @@
 
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function Navbar() {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, configured, signOut } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
 
   const isActive = (path: string) => pathname === path;
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.refresh();
+    router.push("/");
+  };
 
   return (
     <nav
@@ -73,7 +80,7 @@ export function Navbar() {
 
         {/* Nav Links */}
         <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
-          {user && (
+          {configured && !loading && user && (
             <>
               <Link
                 href="/upload"
@@ -112,11 +119,11 @@ export function Navbar() {
             </>
           )}
 
-          {!loading && (
+          {configured && !loading && (
             <>
               {user ? (
                 <button
-                  onClick={signOut}
+                  onClick={handleSignOut}
                   className="btn-ghost"
                   style={{
                     padding: "8px 20px",
@@ -126,9 +133,22 @@ export function Navbar() {
                   Sign Out
                 </button>
               ) : (
-                <Link href="/sign-in" className="btn-accent" style={{ padding: "8px 20px", fontSize: "0.75rem" }}>
-                  Sign In
-                </Link>
+                <>
+                  <Link
+                    href="/sign-in"
+                    className="btn-ghost"
+                    style={{ padding: "8px 20px", fontSize: "0.75rem" }}
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    className="btn-accent"
+                    style={{ padding: "8px 20px", fontSize: "0.75rem" }}
+                  >
+                    Sign Up
+                  </Link>
+                </>
               )}
             </>
           )}
@@ -137,3 +157,4 @@ export function Navbar() {
     </nav>
   );
 }
+

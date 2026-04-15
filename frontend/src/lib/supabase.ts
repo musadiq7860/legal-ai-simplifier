@@ -1,8 +1,9 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 let supabaseInstance: SupabaseClient | null = null;
 
-function isConfigured(): boolean {
+export function isConfigured(): boolean {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   return !!(
@@ -19,17 +20,15 @@ export function getSupabase(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-  if (!url.startsWith("http")) {
+  if (!url.startsWith("https://")) {
     // Return a dummy client that won't crash — auth calls will simply fail gracefully
-    supabaseInstance = createClient(
+    supabaseInstance = createBrowserClient(
       "https://placeholder.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder"
     );
     return supabaseInstance;
   }
 
-  supabaseInstance = createClient(url, key);
+  supabaseInstance = createBrowserClient(url, key);
   return supabaseInstance;
 }
-
-export { isConfigured };
